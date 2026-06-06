@@ -134,6 +134,9 @@ body {
   border-radius: 16px;
   box-shadow: var(--shadow-xl);
   transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  max-width: 100%;
+  width: 100%;
+  overflow: hidden;
 }
 
 .glass-card:hover {
@@ -296,11 +299,14 @@ body {
   display: grid;
   grid-template-columns: 280px 1fr;
   min-height: 100vh;
+  max-width: 100vw;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 @media (max-width: 992px) {
   .dashboard-layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: 100%;
   }
 }
 
@@ -364,12 +370,16 @@ body {
   padding: 40px;
   max-height: calc(100vh - 97px);
   overflow-y: auto;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 992px) {
   .main-content {
-    padding: 20px;
-    max-height: calc(100vh - 73px);
+    max-height: none !important;
+    overflow-y: visible !important;
+    padding: 16px;
   }
 }
 
@@ -447,6 +457,9 @@ body {
   border: 1px solid var(--border-color);
   background: var(--bg-surface);
   margin-top: 20px;
+  width: 100%;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
 }
 
 .custom-table {
@@ -653,15 +666,16 @@ body {
 
 @media (max-width: 768px) {
   .college-header {
-    padding: 12px 20px;
-    gap: 16px;
+    padding: 10px 16px;
+    gap: 12px;
     flex-direction: row;
     align-items: center;
+    position: static !important; /* Let branding scroll away on mobile */
   }
   
   .college-header-logo {
-    height: 48px;
-    width: 48px;
+    height: 44px;
+    width: 44px;
     background: #ffffff;
     border-radius: 50%;
     padding: 3px;
@@ -669,20 +683,41 @@ body {
   }
   
   .college-header-title {
-    font-size: 1.05rem;
+    font-size: 0.95rem;
   }
   
   .college-header-subtitle {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     letter-spacing: 0.5px;
+  }
+}
+
+@media (max-width: 580px) {
+  .college-header {
+    padding: 8px 12px;
+  }
+  
+  .college-header-logo {
+    height: 36px;
+    width: 36px;
+    padding: 2px;
+  }
+  
+  .college-header-title {
+    font-size: 0.8rem;
+  }
+  
+  .college-header-subtitle {
+    display: none; /* Hide subtitle to keep header thin on small screens */
   }
 }
 
 @media (max-width: 480px) {
   .college-header {
-    flex-direction: column;
-    text-align: center;
+    flex-direction: row; /* Keep row layout */
+    text-align: left;
     align-items: center;
+    justify-content: space-between;
     gap: 10px;
   }
 }
@@ -808,9 +843,9 @@ body {
 
 @media (max-width: 480px) {
   .college-header-brand {
-    flex-direction: column;
-    text-align: center;
-    gap: 12px;
+    flex-direction: row; /* Keep row layout */
+    text-align: left;
+    gap: 10px;
   }
 }
 
@@ -834,14 +869,9 @@ body {
   -webkit-backdrop-filter: blur(12px);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 992px) {
   .admin-mobile-header {
-    top: 73px;
-  }
-}
-@media (max-width: 480px) {
-  .admin-mobile-header {
-    top: 133px; /* adjusted for stacked CollegeHeader */
+    top: 0; /* Sticky at top of viewport because college-header is static on mobile */
   }
 }
 

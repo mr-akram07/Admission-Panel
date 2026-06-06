@@ -46,20 +46,7 @@ async function seedDefaultUsers() {
       console.log('Seeded default admin user: username=admin, password=adminpassword');
     }
 
-    // Seed Teacher
-    const teacherExists = await User.findOne({ role: 'teacher' });
-    if (!teacherExists) {
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash('teacherpassword', salt);
-      const teacher = new User({
-        username: 'teacher',
-        email: 'teacher@admission.com',
-        password: hashedPassword,
-        role: 'teacher'
-      });
-      await teacher.save();
-      console.log('Seeded default teacher user: username=teacher, password=teacherpassword');
-    }
+
   } catch (err) {
     console.error('Error seeding default users:', err);
   }

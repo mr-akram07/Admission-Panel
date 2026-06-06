@@ -160,7 +160,7 @@ router.get('/my-application', auth, checkRole(['applicant']), async (req, res) =
 });
 
 // Get all applications (Admin or Teacher)
-router.get('/all', auth, checkRole(['admin', 'teacher']), async (req, res) => {
+router.get('/all', auth, checkRole(['admin']), async (req, res) => {
   try {
     const applications = await Application.find().sort({ submittedAt: -1 });
     res.json(applications);
@@ -171,7 +171,7 @@ router.get('/all', auth, checkRole(['admin', 'teacher']), async (req, res) => {
 });
 
 // Admin Approve Application
-router.post('/:id/approve', auth, checkRole(['admin', 'teacher']), async (req, res) => {
+router.post('/:id/approve', auth, checkRole(['admin']), async (req, res) => {
   try {
     const { studentUsername, studentPassword } = req.body;
     if (!studentUsername || !studentPassword) {
@@ -260,7 +260,7 @@ MAHAMAYA POLYTECHNIC OF INFORMATION TECHNOLOGY, SIDDHARTHNAGAR`;
 });
 
 // Admin Reject Application
-router.post('/:id/reject', auth, checkRole(['admin', 'teacher']), async (req, res) => {
+router.post('/:id/reject', auth, checkRole(['admin']), async (req, res) => {
   try {
     const { rejectionReason } = req.body;
     if (!rejectionReason) {
@@ -310,7 +310,7 @@ MAHAMAYA POLYTECHNIC OF INFORMATION TECHNOLOGY, SIDDHARTHNAGAR`;
 });
 
 // Admin Edit Application/Student Details
-router.put('/:id', auth, checkRole(['admin', 'teacher']), async (req, res) => {
+router.put('/:id', auth, checkRole(['admin']), async (req, res) => {
   try {
     const updates = req.body;
     const application = await Application.findById(req.params.id);
@@ -354,7 +354,7 @@ router.put('/:id', auth, checkRole(['admin', 'teacher']), async (req, res) => {
 });
 
 // Admin Delete Application and associated accounts
-router.delete('/:id', auth, checkRole(['admin', 'teacher']), async (req, res) => {
+router.delete('/:id', auth, checkRole(['admin']), async (req, res) => {
   try {
     const application = await Application.findById(req.params.id);
     if (!application) {

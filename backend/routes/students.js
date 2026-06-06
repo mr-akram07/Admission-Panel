@@ -54,7 +54,7 @@ router.put('/profile', auth, checkRole(['student']), upload.single('photo'), asy
 });
 
 // Get all approved students (Admin/Teacher only)
-router.get('/all', auth, checkRole(['admin', 'teacher']), async (req, res) => {
+router.get('/all', auth, checkRole(['admin']), async (req, res) => {
   try {
     const students = await Application.find({ status: 'approved' }).sort({ updatedAt: -1 });
     res.json(students);

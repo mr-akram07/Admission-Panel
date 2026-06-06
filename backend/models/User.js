@@ -7,7 +7,7 @@ const UserSchema = new mongoose.Schema({
   plainPassword: { type: String },
   role: {
     type: String,
-    enum: ['admin', 'teacher', 'student', 'applicant'],
+    enum: ['admin', 'student', 'applicant'],
     default: 'applicant'
   },
   createdAt: { type: Date, default: Date.now }

@@ -5,7 +5,7 @@ const Application = require('../models/Application');
 const { auth, checkRole } = require('../middleware/auth');
 
 // Export students to Excel by month
-router.get('/students', auth, checkRole(['admin', 'teacher']), async (req, res) => {
+router.get('/students', auth, checkRole(['admin']), async (req, res) => {
   try {
     const { month } = req.query; // format: 'YYYY-MM'
     if (!month) {
