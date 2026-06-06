@@ -18,6 +18,48 @@ const sendAdmissionEmail = async (toEmail, subject, messageText) => {
     return;
   }
 
+  // If password is a Brevo API Key, use Brevo HTTP API directly for better reliability on cloud environments (like Render)
+  if (emailPass.startsWith('xkeysib-')) {
+    try {
+      const url = 'https://api.brevo.com/v3/smtp/email';
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'accept': 'application/json',
+          'api-key': emailPass,
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+          sender: {
+            name: "MAHAMAYA POLYTECHNIC OF INFORMATION TECHNOLOGY, SIDDHARTHNAGAR",
+            email: emailUser
+          },
+          to: [
+            {
+              email: toEmail
+            }
+          ],
+          subject: subject,
+          textContent: messageText
+        })
+      });
+
+      const responseData = await response.json();
+
+      if (response.ok) {
+        console.log(`✉️  Admission email sent successfully via Brevo API to: ${toEmail}`);
+        return;
+      } else {
+        console.warn(`⚠️  Brevo API failed with status ${response.status}:`, responseData.message || responseData);
+        console.log('🔄  Attempting fallback to Nodemailer SMTP...');
+      }
+    } catch (apiError) {
+      console.warn('⚠️  Brevo API request failed:', apiError.message || apiError);
+      console.log('🔄  Attempting fallback to Nodemailer SMTP...');
+    }
+  }
+
+  // Fallback / Default SMTP sending
   try {
     const transporter = nodemailer.createTransport({
       host: emailHost,
@@ -35,7 +77,7 @@ const sendAdmissionEmail = async (toEmail, subject, messageText) => {
       subject: subject,
       text: messageText
     });
-    console.log(`✉️  Admission email sent successfully to: ${toEmail}`);
+    console.log(`✉️  Admission email sent successfully via SMTP to: ${toEmail}`);
   } catch (error) {
     console.error('❌  Email notification failed to send:', error.message || error);
   }
