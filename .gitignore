@@ -1,0 +1,21 @@
+# Frontend files to ignore
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/*.local
+
+# Backend files to ignore
+backend/node_modules/
+backend/.env
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Global logs and editor settings
+logs
+*.log
+npm-debug.log*
+.vscode/
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
