@@ -3,6 +3,8 @@ const nodemailer = require('nodemailer');
 const sendAdmissionEmail = async (toEmail, subject, messageText) => {
   const emailUser = process.env.EMAIL_USER;
   const emailPass = process.env.EMAIL_PASS;
+  const emailHost = process.env.EMAIL_HOST || 'smtp-relay.brevo.com';
+  const emailPort = parseInt(process.env.EMAIL_PORT || '587');
 
   // Simulation mode if credentials are empty/missing
   if (!emailUser || !emailPass || emailUser === '' || emailPass === '') {
@@ -18,7 +20,9 @@ const sendAdmissionEmail = async (toEmail, subject, messageText) => {
 
   try {
     const transporter = nodemailer.createTransport({
-      service: 'gmail', // Can be replaced by custom SMTP services
+      host: emailHost,
+      port: emailPort,
+      secure: emailPort === 465, // true for port 465, false for 587 and others
       auth: {
         user: emailUser,
         pass: emailPass
