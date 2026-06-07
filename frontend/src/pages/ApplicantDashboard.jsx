@@ -96,12 +96,26 @@ const ApplicantDashboard = () => {
     }
   };
 
-  const handlePhotoChange = (e) => setPhotoFile(e.target.files[0]);
-  const handleMarksheet10Change = (e) => setMarksheet10File(e.target.files[0]);
-  const handleMarksheet12Change = (e) => setMarksheet12File(e.target.files[0]);
-  const handleIncomeCertChange = (e) => setIncomeCertFile(e.target.files[0]);
-  const handleDomicileCertChange = (e) => setDomicileCertFile(e.target.files[0]);
-  const handleCasteCertChange = (e) => setCasteCertFile(e.target.files[0]);
+  const handleFileChange = (setter, label) => (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 10 * 1024 * 1024) {
+        setError(`File size error: ${label} must be less than 10MB. Selected file is ${(file.size / (1024 * 1024)).toFixed(2)}MB.`);
+        e.target.value = null; // reset file input
+        setter(null);
+      } else {
+        setError('');
+        setter(file);
+      }
+    }
+  };
+
+  const handlePhotoChange = handleFileChange(setPhotoFile, 'Applicant Photo');
+  const handleMarksheet10Change = handleFileChange(setMarksheet10File, '10th Marksheet');
+  const handleMarksheet12Change = handleFileChange(setMarksheet12File, '12th Marksheet');
+  const handleIncomeCertChange = handleFileChange(setIncomeCertFile, 'Income Certificate');
+  const handleDomicileCertChange = handleFileChange(setDomicileCertFile, 'Domicile Certificate');
+  const handleCasteCertChange = handleFileChange(setCasteCertFile, 'Caste Certificate');
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
@@ -119,16 +133,40 @@ const ApplicantDashboard = () => {
       setError('Applicant photo is compulsory.');
       return;
     }
+    if (photoFile.size > 10 * 1024 * 1024) {
+      setError('Applicant photo must be less than 10MB.');
+      return;
+    }
     if (!marksheet10File) {
       setError('10th Marksheet is compulsory.');
+      return;
+    }
+    if (marksheet10File.size > 10 * 1024 * 1024) {
+      setError('10th Marksheet must be less than 10MB.');
+      return;
+    }
+    if (marksheet12File && marksheet12File.size > 10 * 1024 * 1024) {
+      setError('12th Marksheet must be less than 10MB.');
       return;
     }
     if (!incomeCertFile) {
       setError('Income Certificate is compulsory.');
       return;
     }
+    if (incomeCertFile.size > 10 * 1024 * 1024) {
+      setError('Income Certificate must be less than 10MB.');
+      return;
+    }
     if (!domicileCertFile) {
       setError('Domicile Certificate is compulsory.');
+      return;
+    }
+    if (domicileCertFile.size > 10 * 1024 * 1024) {
+      setError('Domicile Certificate must be less than 10MB.');
+      return;
+    }
+    if (casteCertFile && casteCertFile.size > 10 * 1024 * 1024) {
+      setError('Caste Certificate must be less than 10MB.');
       return;
     }
 
@@ -579,7 +617,7 @@ const ApplicantDashboard = () => {
                   }}>
                     {/* Profile Photo Upload */}
                     <div className="form-group">
-                      <label className="form-label">Applicant Photo</label>
+                      <label className="form-label">Applicant Photo <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 'normal' }}>(Max 10MB)</span></label>
                       <input 
                         type="file" 
                         className="form-input" 
@@ -588,12 +626,12 @@ const ApplicantDashboard = () => {
                         required
                         disabled={formLoading}
                       />
-                      <small style={{ color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>Accepts JPEG, JPG, PNG, GIF, WEBP, BMP, SVG.</small>
+                      <small style={{ color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>Accepts JPEG, JPG, PNG, GIF, WEBP, BMP, SVG. Max size: 10MB.</small>
                     </div>
 
                     {/* 10th Marksheet */}
                     <div className="form-group">
-                      <label className="form-label">10th Marksheet</label>
+                      <label className="form-label">10th Marksheet <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 'normal' }}>(Max 10MB)</span></label>
                       <input 
                         type="file" 
                         className="form-input" 
@@ -602,12 +640,12 @@ const ApplicantDashboard = () => {
                         required
                         disabled={formLoading}
                       />
-                      <small style={{ color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>Upload 10th Marksheet (PDF or Image).</small>
+                      <small style={{ color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>Upload 10th Marksheet (PDF or Image). Max size: 10MB.</small>
                     </div>
 
                     {/* 12th Marksheet */}
                     <div className="form-group">
-                      <label className="form-label">12th Marksheet (Optional)</label>
+                      <label className="form-label">12th Marksheet (Optional) <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 'normal' }}>(Max 10MB)</span></label>
                       <input 
                         type="file" 
                         className="form-input" 
@@ -615,12 +653,12 @@ const ApplicantDashboard = () => {
                         onChange={handleMarksheet12Change}
                         disabled={formLoading}
                       />
-                      <small style={{ color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>Upload 12th Marksheet if available.</small>
+                      <small style={{ color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>Upload 12th Marksheet if available. Max size: 10MB.</small>
                     </div>
 
                     {/* Income Cert */}
                     <div className="form-group">
-                      <label className="form-label">Income Certificate</label>
+                      <label className="form-label">Income Certificate <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 'normal' }}>(Max 10MB)</span></label>
                       <input 
                         type="file" 
                         className="form-input" 
@@ -629,12 +667,12 @@ const ApplicantDashboard = () => {
                         required
                         disabled={formLoading}
                       />
-                      <small style={{ color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>Upload Income Certificate.</small>
+                      <small style={{ color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>Upload Income Certificate. Max size: 10MB.</small>
                     </div>
 
                     {/* Domicile Cert */}
                     <div className="form-group">
-                      <label className="form-label">Domicile Certificate</label>
+                      <label className="form-label">Domicile Certificate <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 'normal' }}>(Max 10MB)</span></label>
                       <input 
                         type="file" 
                         className="form-input" 
@@ -643,12 +681,12 @@ const ApplicantDashboard = () => {
                         required
                         disabled={formLoading}
                       />
-                      <small style={{ color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>Upload Domicile Certificate.</small>
+                      <small style={{ color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>Upload Domicile Certificate. Max size: 10MB.</small>
                     </div>
 
                     {/* Caste Cert */}
                     <div className="form-group">
-                      <label className="form-label">Caste Certificate (Optional)</label>
+                      <label className="form-label">Caste Certificate (Optional) <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 'normal' }}>(Max 10MB)</span></label>
                       <input 
                         type="file" 
                         className="form-input" 
@@ -656,7 +694,7 @@ const ApplicantDashboard = () => {
                         onChange={handleCasteCertChange}
                         disabled={formLoading}
                       />
-                      <small style={{ color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>Upload Caste Certificate if applicable.</small>
+                      <small style={{ color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>Upload Caste Certificate if applicable. Max size: 10MB.</small>
                     </div>
                   </div>
                 </div>

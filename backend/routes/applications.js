@@ -7,7 +7,7 @@ const User = require('../models/User');
 const { auth, checkRole } = require('../middleware/auth');
 const upload = require('../middleware/upload');
 const { sendAdmissionEmail } = require('../utils/email');
-const { uploadToCloudinary } = require('../utils/cloudinary');
+const { uploadToCloudinary, deleteFromCloudinary } = require('../utils/cloudinary');
 
 // Create/Submit Admission Application (Applicant only)
 router.post('/submit', auth, checkRole(['applicant']), upload.fields([
@@ -383,6 +383,30 @@ router.delete('/:id', auth, checkRole(['admin']), async (req, res) => {
     const application = await Application.findById(req.params.id);
     if (!application) {
       return res.status(404).json({ message: 'Application not found' });
+    }
+
+    // Delete associated documents from Cloudinary
+    const filesToDelete = [
+      application.photo,
+      application.marksheet10,
+      application.marksheet12,
+      application.incomeCert,
+      application.domicileCert,
+      application.casteCert
+    ];
+
+    if (application.documents && application.documents.length > 0) {
+      application.documents.forEach(doc => {
+        if (doc && doc.path) {
+          filesToDelete.push(doc.path);
+        }
+      });
+    }
+
+    for (const url of filesToDelete) {
+      if (url) {
+        await deleteFromCloudinary(url);
+      }
     }
 
     // Delete student user account if it was created

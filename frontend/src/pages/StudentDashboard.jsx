@@ -70,6 +70,13 @@ const StudentDashboard = () => {
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (file.size > 10 * 1024 * 1024) {
+        setError(`Photo must be less than 10MB. Selected file is ${(file.size / (1024 * 1024)).toFixed(2)}MB.`);
+        e.target.value = null;
+        setPhotoFile(null);
+        return;
+      }
+      setError('');
       setPhotoFile(file);
       setPhotoPreview(URL.createObjectURL(file));
     }
@@ -132,10 +139,27 @@ const StudentDashboard = () => {
   const [optionalDocFile, setOptionalDocFile] = useState(null);
   const [uploadingOptional, setUploadingOptional] = useState(false);
 
+  const handleOptionalDocChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 10 * 1024 * 1024) {
+        alert(`File size error: Selected file must be less than 10MB. Selected file is ${(file.size / (1024 * 1024)).toFixed(2)}MB.`);
+        e.target.value = null;
+        setOptionalDocFile(null);
+      } else {
+        setOptionalDocFile(file);
+      }
+    }
+  };
+
   const handleUploadOptionalDoc = async (e) => {
     e.preventDefault();
     if (!optionalDocFile) {
       alert('Please select a file to upload.');
+      return;
+    }
+    if (optionalDocFile.size > 10 * 1024 * 1024) {
+      alert(`File size error: Selected file must be less than 10MB. Currently it is ${(optionalDocFile.size / (1024 * 1024)).toFixed(2)}MB.`);
       return;
     }
     if (!selectedOptionalDocType) {
@@ -318,7 +342,7 @@ const StudentDashboard = () => {
               )}
               
               <label className="btn btn-secondary photo-upload-btn" style={{ padding: '6px 14px', fontSize: '0.8rem', gap: '6px' }}>
-                <Camera size={14} /> Update Photo
+                <Camera size={14} /> Update Photo <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>(Max 10MB)</span>
                 <input type="file" accept="image/*" onChange={handlePhotoChange} disabled={saving} />
               </label>
             </div>
@@ -420,13 +444,13 @@ const StudentDashboard = () => {
                 )}
 
                 <div className="form-group" style={{ marginBottom: '16px' }}>
-                  <label className="form-label" style={{ fontSize: '0.75rem' }}>Select File (PDF/Image)</label>
+                  <label className="form-label" style={{ fontSize: '0.75rem' }}>Select File (PDF/Image) <span style={{ color: 'var(--text-muted)', fontSize: '0.7rem', fontWeight: 'normal' }}>(Max 10MB)</span></label>
                   <input 
                     type="file" 
                     className="form-input" 
                     style={{ padding: '6px 12px', fontSize: '0.85rem' }}
                     accept="image/*,application/pdf"
-                    onChange={(e) => setOptionalDocFile(e.target.files[0])}
+                    onChange={handleOptionalDocChange}
                     required
                     disabled={uploadingOptional}
                   />

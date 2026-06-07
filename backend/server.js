@@ -65,10 +65,28 @@ app.get('/api/health', (req, res) => {
 
 // Global Error Handler for Upload Size and General Errors
 const multer = require('multer');
+const fs = require('fs');
 app.use((err, req, res, next) => {
+  // Cleanup any partial files uploaded locally on error
+  if (req.file && req.file.path && fs.existsSync(req.file.path)) {
+    try { fs.unlinkSync(req.file.path); } catch (e) { console.error('Error cleaning up local file:', e); }
+  }
+  if (req.files) {
+    Object.keys(req.files).forEach(key => {
+      const filesArr = req.files[key];
+      if (Array.isArray(filesArr)) {
+        filesArr.forEach(f => {
+          if (f && f.path && fs.existsSync(f.path)) {
+            try { fs.unlinkSync(f.path); } catch (e) { console.error('Error cleaning up local file:', e); }
+          }
+        });
+      }
+    });
+  }
+
   if (err instanceof multer.MulterError) {
     if (err.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).json({ message: 'File is too large! Maximum allowed size is 50MB.' });
+      return res.status(400).json({ message: 'File is too large! Maximum allowed size is 10MB.' });
     }
     return res.status(400).json({ message: `Upload error: ${err.message}` });
   }
