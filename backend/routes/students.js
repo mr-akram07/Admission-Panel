@@ -5,6 +5,7 @@ const Application = require('../models/Application');
 const User = require('../models/User');
 const { auth, checkRole } = require('../middleware/auth');
 const upload = require('../middleware/upload');
+const { uploadToCloudinary } = require('../utils/cloudinary');
 
 // Get student profile (for logged-in student)
 router.get('/profile', auth, checkRole(['student']), async (req, res) => {
@@ -40,7 +41,8 @@ router.put('/profile', auth, checkRole(['student']), upload.single('photo'), asy
     if (address) student.address = address;
 
     if (req.file) {
-      student.photo = 'uploads/' + req.file.filename;
+      const cloudinaryUrl = await uploadToCloudinary(req.file.path);
+      student.photo = cloudinaryUrl;
     }
 
     student.updatedAt = Date.now();
@@ -77,9 +79,10 @@ router.post('/upload-document', auth, checkRole(['student']), upload.single('doc
       return res.status(404).json({ message: 'Student profile not found' });
     }
 
+    const cloudinaryUrl = await uploadToCloudinary(req.file.path);
     student.documents.push({
       name: documentName || req.file.originalname,
-      path: 'uploads/' + req.file.filename
+      path: cloudinaryUrl
     });
 
     student.updatedAt = Date.now();
@@ -165,7 +168,8 @@ router.post('/upload-optional', auth, checkRole(['student']), upload.single('fil
       return res.status(400).json({ message: 'This document has already been uploaded.' });
     }
 
-    student[docType] = 'uploads/' + req.file.filename;
+    const cloudinaryUrl = await uploadToCloudinary(req.file.path);
+    student[docType] = cloudinaryUrl;
     student.updatedAt = Date.now();
     await student.save();
 

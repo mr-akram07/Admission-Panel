@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
+const fs = require('fs');
 const bcrypt = require('bcryptjs');
 const Application = require('../models/Application');
 const User = require('../models/User');
 const { auth, checkRole } = require('../middleware/auth');
 const upload = require('../middleware/upload');
 const { sendAdmissionEmail } = require('../utils/email');
+const { uploadToCloudinary } = require('../utils/cloudinary');
 
 // Create/Submit Admission Application (Applicant only)
 router.post('/submit', auth, checkRole(['applicant']), upload.fields([
@@ -37,50 +39,72 @@ router.post('/submit', auth, checkRole(['applicant']), upload.fields([
       return res.status(400).json({ message: 'JEECUP Application Number already registered with another application.' });
     }
 
-    // Process file paths
-    let photoPath = '';
-    if (req.files && req.files['photo']) {
-      photoPath = 'uploads/' + req.files['photo'][0].filename;
-    }
-    let marksheet10Path = '';
-    if (req.files && req.files['marksheet10']) {
-      marksheet10Path = 'uploads/' + req.files['marksheet10'][0].filename;
-    }
-    let marksheet12Path = '';
-    if (req.files && req.files['marksheet12']) {
-      marksheet12Path = 'uploads/' + req.files['marksheet12'][0].filename;
-    }
-    let incomeCertPath = '';
-    if (req.files && req.files['incomeCert']) {
-      incomeCertPath = 'uploads/' + req.files['incomeCert'][0].filename;
-    }
-    let domicileCertPath = '';
-    if (req.files && req.files['domicileCert']) {
-      domicileCertPath = 'uploads/' + req.files['domicileCert'][0].filename;
-    }
-    let casteCertPath = '';
-    if (req.files && req.files['casteCert']) {
-      casteCertPath = 'uploads/' + req.files['casteCert'][0].filename;
-    }
+    // Check files on local disk
+    const photoFile = req.files && req.files['photo'] ? req.files['photo'][0] : null;
+    const marksheet10File = req.files && req.files['marksheet10'] ? req.files['marksheet10'][0] : null;
+    const marksheet12File = req.files && req.files['marksheet12'] ? req.files['marksheet12'][0] : null;
+    const incomeCertFile = req.files && req.files['incomeCert'] ? req.files['incomeCert'][0] : null;
+    const domicileCertFile = req.files && req.files['domicileCert'] ? req.files['domicileCert'][0] : null;
+    const casteCertFile = req.files && req.files['casteCert'] ? req.files['casteCert'][0] : null;
+
+    // Helper to delete local files on validation error
+    const cleanupLocalFiles = () => {
+      const files = [photoFile, marksheet10File, marksheet12File, incomeCertFile, domicileCertFile, casteCertFile];
+      files.forEach(f => {
+        if (f && f.path && fs.existsSync(f.path)) {
+          try { fs.unlinkSync(f.path); } catch (e) { console.error('Error cleaning up local file:', e); }
+        }
+      });
+    };
 
     // Validate inputs
     if (!name || !email || !dob || !gender || !phone || !address || !branch || !fathersName || !jeecupAppNo) {
+      cleanupLocalFiles();
       return res.status(400).json({ message: 'All text fields are required.' });
     }
     if (!/^\+91\d{10,}$/.test(phone)) {
+      cleanupLocalFiles();
       return res.status(400).json({ message: 'Phone number must be +91 followed by at least 10 digits.' });
     }
-    if (!photoPath) {
+    if (!photoFile) {
+      cleanupLocalFiles();
       return res.status(400).json({ message: 'Applicant photo is required.' });
     }
-    if (!marksheet10Path) {
+    if (!marksheet10File) {
+      cleanupLocalFiles();
       return res.status(400).json({ message: '10th Marksheet is required.' });
     }
-    if (!incomeCertPath) {
+    if (!incomeCertFile) {
+      cleanupLocalFiles();
       return res.status(400).json({ message: 'Income Certificate is required.' });
     }
-    if (!domicileCertPath) {
+    if (!domicileCertFile) {
+      cleanupLocalFiles();
       return res.status(400).json({ message: 'Domicile Certificate is required.' });
+    }
+
+    // Upload to Cloudinary after all validations pass
+    let photoPath = '';
+    let marksheet10Path = '';
+    let marksheet12Path = '';
+    let incomeCertPath = '';
+    let domicileCertPath = '';
+    let casteCertPath = '';
+
+    try {
+      photoPath = await uploadToCloudinary(photoFile.path);
+      marksheet10Path = await uploadToCloudinary(marksheet10File.path);
+      if (marksheet12File) {
+        marksheet12Path = await uploadToCloudinary(marksheet12File.path);
+      }
+      incomeCertPath = await uploadToCloudinary(incomeCertFile.path);
+      domicileCertPath = await uploadToCloudinary(domicileCertFile.path);
+      if (casteCertFile) {
+        casteCertPath = await uploadToCloudinary(casteCertFile.path);
+      }
+    } catch (uploadError) {
+      cleanupLocalFiles();
+      throw uploadError;
     }
 
     // If there is an existing rejected application, we delete it to start fresh.

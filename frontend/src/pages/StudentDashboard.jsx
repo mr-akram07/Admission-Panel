@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { AuthContext, API_URL } from '../context/AuthContext';
+import { AuthContext, API_URL, getFileUrl } from '../context/AuthContext';
 import { LogOut, Save, Camera, GraduationCap, Phone, MapPin, User, Mail, Calendar, BookOpen, Upload, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import CollegeHeader from '../components/CollegeHeader';
@@ -51,7 +51,7 @@ const StudentDashboard = () => {
       setPhone(fetchedPhone);
       setAddress(data.address || '');
       if (data.photo) {
-        setPhotoPreview(`${API_URL}/${data.photo}`);
+        setPhotoPreview(getFileUrl(data.photo));
       }
     } catch (err) {
       console.error(err);
@@ -117,7 +117,7 @@ const StudentDashboard = () => {
       setProfile(data.student);
       setSuccess('Your profile contact information updated successfully.');
       if (data.student.photo) {
-        setPhotoPreview(`${API_URL}/${data.student.photo}`);
+        setPhotoPreview(getFileUrl(data.student.photo));
       }
     } catch (err) {
       setError(err.message || 'An error occurred while saving.');
@@ -513,36 +513,36 @@ const StudentDashboard = () => {
                   <label className="form-label">Admitted Document Attachments</label>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', background: 'rgba(0,0,0,0.15)', padding: '12px', borderRadius: '8px' }}>
                     {profile?.marksheet10 && (
-                      <a href={`${API_URL}/${profile.marksheet10}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 500 }}>
+                      <a href={getFileUrl(profile.marksheet10)} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 500 }}>
                         ✓ 10th Marksheet (Compulsory)
                       </a>
                     )}
                     {profile?.marksheet12 ? (
-                      <a href={`${API_URL}/${profile.marksheet12}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 500 }}>
+                      <a href={getFileUrl(profile.marksheet12)} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 500 }}>
                         ✓ 12th Marksheet (Optional)
                       </a>
                     ) : (
                       <span style={{ fontSize: '0.85rem', color: 'var(--text-disabled)' }}>✗ 12th Marksheet: Not Uploaded</span>
                     )}
                     {profile?.incomeCert && (
-                      <a href={`${API_URL}/${profile.incomeCert}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 500 }}>
+                      <a href={getFileUrl(profile.incomeCert)} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 500 }}>
                         ✓ Income Certificate (Compulsory)
                       </a>
                     )}
                     {profile?.domicileCert && (
-                      <a href={`${API_URL}/${profile.domicileCert}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 500 }}>
+                      <a href={getFileUrl(profile.domicileCert)} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 500 }}>
                         ✓ Domicile Certificate (Compulsory)
                       </a>
                     )}
                     {profile?.casteCert ? (
-                      <a href={`${API_URL}/${profile.casteCert}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 500 }}>
+                      <a href={getFileUrl(profile.casteCert)} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 500 }}>
                         ✓ Caste Certificate (Optional)
                       </a>
                     ) : (
                       <span style={{ fontSize: '0.85rem', color: 'var(--text-disabled)' }}>✗ Caste Certificate: Not Uploaded</span>
                     )}
                     {profile?.documents && profile.documents.map((doc, idx) => (
-                      <a key={idx} href={`${API_URL}/${doc.path}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 500 }}>
+                      <a key={idx} href={getFileUrl(doc.path)} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 500 }}>
                         ✓ {doc.name}
                       </a>
                     ))}

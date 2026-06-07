@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { AuthContext, API_URL } from '../context/AuthContext';
+import { AuthContext, API_URL, getFileUrl } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import CollegeHeader from '../components/CollegeHeader';
 import { 
@@ -750,7 +750,7 @@ const AdminDashboard = () => {
                         <td>
                           {student.photo ? (
                             <img 
-                              src={`${API_URL}/${student.photo}`} 
+                              src={getFileUrl(student.photo)} 
                               alt="Student avatar" 
                               style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }}
                             />
@@ -1075,7 +1075,7 @@ const AdminDashboard = () => {
               <div style={{ display: 'flex', gap: '20px', marginBottom: '24px' }}>
                 {selectedApp.photo ? (
                   <img 
-                    src={`${API_URL}/${selectedApp.photo}`} 
+                    src={getFileUrl(selectedApp.photo)} 
                     alt="Applicant Photo" 
                     style={{ width: '100px', height: '100px', borderRadius: '8px', objectFit: 'cover', border: '1px solid var(--border-color)' }}
                   />
@@ -1129,12 +1129,12 @@ const AdminDashboard = () => {
                   <strong style={{ display: 'block', fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '6px' }}>UPLOADED CERTIFICATES</strong>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', background: 'var(--bg-inset)', padding: '12px', borderRadius: '8px' }}>
                     {selectedApp.marksheet10 && (
-                      <a href={`${API_URL}/${selectedApp.marksheet10}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                      <a href={getFileUrl(selectedApp.marksheet10)} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                         <BookOpen size={14} /> 10th Marksheet (Compulsory)
                       </a>
                     )}
                     {selectedApp.marksheet12 ? (
-                      <a href={`${API_URL}/${selectedApp.marksheet12}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                      <a href={getFileUrl(selectedApp.marksheet12)} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                         <BookOpen size={14} /> 12th Marksheet (Optional)
                       </a>
                     ) : (
@@ -1143,17 +1143,17 @@ const AdminDashboard = () => {
                       </span>
                     )}
                     {selectedApp.incomeCert && (
-                      <a href={`${API_URL}/${selectedApp.incomeCert}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                      <a href={getFileUrl(selectedApp.incomeCert)} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                         <BookOpen size={14} /> Income Certificate (Compulsory)
                       </a>
                     )}
                     {selectedApp.domicileCert && (
-                      <a href={`${API_URL}/${selectedApp.domicileCert}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                      <a href={getFileUrl(selectedApp.domicileCert)} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                         <BookOpen size={14} /> Domicile Certificate (Compulsory)
                       </a>
                     )}
                     {selectedApp.casteCert ? (
-                      <a href={`${API_URL}/${selectedApp.casteCert}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                      <a href={getFileUrl(selectedApp.casteCert)} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                         <BookOpen size={14} /> Caste Certificate (Optional)
                       </a>
                     ) : (
@@ -1162,7 +1162,7 @@ const AdminDashboard = () => {
                       </span>
                     )}
                     {selectedApp.documents && selectedApp.documents.map((doc, idx) => (
-                      <a key={idx} href={`${API_URL}/${doc.path}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                      <a key={idx} href={getFileUrl(doc.path)} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                         <BookOpen size={14} /> {doc.name}
                       </a>
                     ))}

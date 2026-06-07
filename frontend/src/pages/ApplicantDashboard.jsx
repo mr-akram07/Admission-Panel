@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { AuthContext, API_URL } from '../context/AuthContext';
+import { AuthContext, API_URL, getFileUrl } from '../context/AuthContext';
 import { LogOut, CheckCircle2, Clock, XCircle, FilePlus, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import CollegeHeader from '../components/CollegeHeader';
@@ -384,7 +384,7 @@ const ApplicantDashboard = () => {
                   <div>
                     <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '8px' }}>PHOTO</span>
                     <img 
-                      src={`${API_URL}/${application.photo}`} 
+                      src={getFileUrl(application.photo)} 
                       alt="Student Photo" 
                       style={{ width: '100px', height: '100px', borderRadius: '8px', objectFit: 'cover', border: '1px solid var(--border-color)' }} 
                     />
@@ -394,29 +394,29 @@ const ApplicantDashboard = () => {
                   <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'block', marginBottom: '8px' }}>UPLOADED CERTIFICATES</span>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', background: 'rgba(0,0,0,0.15)', padding: '12px', borderRadius: '8px' }}>
                     {application.marksheet10 && (
-                      <a href={`${API_URL}/${application.marksheet10}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500 }}>
+                      <a href={getFileUrl(application.marksheet10)} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500 }}>
                         ✓ 10th Marksheet (Compulsory)
                       </a>
                     )}
                     {application.marksheet12 ? (
-                      <a href={`${API_URL}/${application.marksheet12}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500 }}>
+                      <a href={getFileUrl(application.marksheet12)} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500 }}>
                         ✓ 12th Marksheet (Optional)
                       </a>
                     ) : (
                       <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>✗ 12th Marksheet: Not Uploaded</span>
                     )}
                     {application.incomeCert && (
-                      <a href={`${API_URL}/${application.incomeCert}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500 }}>
+                      <a href={getFileUrl(application.incomeCert)} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500 }}>
                         ✓ Income Certificate (Compulsory)
                       </a>
                     )}
                     {application.domicileCert && (
-                      <a href={`${API_URL}/${application.domicileCert}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500 }}>
+                      <a href={getFileUrl(application.domicileCert)} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500 }}>
                         ✓ Domicile Certificate (Compulsory)
                       </a>
                     )}
                     {application.casteCert ? (
-                      <a href={`${API_URL}/${application.casteCert}`} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500 }}>
+                      <a href={getFileUrl(application.casteCert)} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)', textDecoration: 'none', fontSize: '0.9rem', fontWeight: 500 }}>
                         ✓ Caste Certificate (Optional)
                       </a>
                     ) : (

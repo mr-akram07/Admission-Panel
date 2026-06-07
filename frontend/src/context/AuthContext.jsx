@@ -4,6 +4,13 @@ export const AuthContext = createContext();
 
 export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
+export const getFileUrl = (path) => {
+  if (!path) return '';
+  return path.startsWith('http://') || path.startsWith('https://') 
+    ? path 
+    : `${API_URL}/${path}`;
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(localStorage.getItem('token') || '');
