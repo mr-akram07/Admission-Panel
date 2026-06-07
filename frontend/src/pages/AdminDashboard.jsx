@@ -6,6 +6,7 @@ import {
   LogOut, Users, FileCheck, ClipboardList, AlertCircle, 
   Download, Eye, EyeOff, Edit3, X, UserCheck, Shield, BookOpen, Calendar, Trash2, Menu
 } from 'lucide-react';
+import Swal from 'sweetalert2';
 
 const AdminDashboard = () => {
   const { user, setUser, token, logout } = useContext(AuthContext);
@@ -173,19 +174,31 @@ const AdminDashboard = () => {
     if (!studentUsername || !studentPassword) return;
 
     if (!/^[a-zA-Z0-9]+$/.test(studentUsername)) {
-      alert('Student username cannot contain spaces or special characters.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Student username cannot contain spaces or special characters.'
+      });
       return;
     }
 
     if (studentPassword.length < 8 || studentPassword.length > 16) {
-      alert('Student password must be between 8 and 16 characters long.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Student password must be between 8 and 16 characters long.'
+      });
       return;
     }
     const hasLetter = /[a-zA-Z]/.test(studentPassword);
     const hasNumber = /[0-9]/.test(studentPassword);
     const hasSpecial = /[!@#$%^&*(),.?":{}|<>_+\-=\[\]{};':"\\|#`~]/.test(studentPassword);
     if (!hasLetter || !hasNumber || !hasSpecial) {
-      alert('Student password must contain a mix of letters, numbers, and special symbols.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Student password must contain a mix of letters, numbers, and special symbols.'
+      });
       return;
     }
 
@@ -211,11 +224,19 @@ const AdminDashboard = () => {
         throw new Error(data.message || 'Approval failed');
       }
 
-      setSuccessMsg(`Approved student: ${selectedApp.name}. Credentials created.`);
+      Swal.fire({
+        icon: 'success',
+        title: 'Approved!',
+        text: `Approved student: ${selectedApp.name}. Credentials created.`
+      });
       setIsDetailModalOpen(false);
       fetchData();
     } catch (err) {
-      alert(err.message);
+      Swal.fire({
+        icon: 'error',
+        title: 'Approval Failed',
+        text: err.message
+      });
     }
   };
 
@@ -334,11 +355,19 @@ const AdminDashboard = () => {
         throw new Error(data.message || 'Rejection failed');
       }
 
-      setSuccessMsg(`Rejected application for: ${selectedApp.name}.`);
+      Swal.fire({
+        icon: 'success',
+        title: 'Rejected',
+        text: `Rejected application for: ${selectedApp.name}.`
+      });
       setIsDetailModalOpen(false);
       fetchData();
     } catch (err) {
-      alert(err.message);
+      Swal.fire({
+        icon: 'error',
+        title: 'Rejection Failed',
+        text: err.message
+      });
     }
   };
 
@@ -346,7 +375,11 @@ const AdminDashboard = () => {
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     if (editFormData.phone.length !== 13) {
-      alert('Phone number must contain exactly 10 digits after +91.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Phone number must contain exactly 10 digits after +91.'
+      });
       return;
     }
     setError('');
@@ -371,17 +404,35 @@ const AdminDashboard = () => {
         throw new Error(data.message || 'Edit details failed');
       }
 
-      setSuccessMsg(`Updated details for student: ${editFormData.name}.`);
+      Swal.fire({
+        icon: 'success',
+        title: 'Updated!',
+        text: `Updated details for student: ${editFormData.name}.`
+      });
       setIsEditModalOpen(false);
       fetchData();
     } catch (err) {
-      alert(err.message);
+      Swal.fire({
+        icon: 'error',
+        title: 'Edit Failed',
+        text: err.message
+      });
     }
   };
 
   // Handle Delete Application & Accounts
   const handleDeleteApp = async (id, name) => {
-    if (!window.confirm(`Are you sure you want to delete the application and associated user accounts for ${name}? This action cannot be undone.`)) {
+    const confirmResult = await Swal.fire({
+      title: 'Are you sure?',
+      text: `Are you sure you want to delete the application and associated user accounts for ${name}? This action cannot be undone.`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    });
+
+    if (!confirmResult.isConfirmed) {
       return;
     }
 
@@ -405,11 +456,19 @@ const AdminDashboard = () => {
         throw new Error(data.message || 'Failed to delete application');
       }
 
-      setSuccessMsg(`Successfully deleted applicant: ${name}`);
+      Swal.fire({
+        icon: 'success',
+        title: 'Deleted!',
+        text: `Successfully deleted applicant: ${name}`
+      });
       setIsDetailModalOpen(false);
       fetchData(); // Refresh lists
     } catch (err) {
-      alert(err.message);
+      Swal.fire({
+        icon: 'error',
+        title: 'Delete Failed',
+        text: err.message
+      });
     }
   };
 

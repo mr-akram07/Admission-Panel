@@ -3,6 +3,7 @@ import { AuthContext, API_URL, getFileUrl } from '../context/AuthContext';
 import { LogOut, Save, Camera, GraduationCap, Phone, MapPin, User, Mail, Calendar, BookOpen, Upload, Eye, EyeOff } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import CollegeHeader from '../components/CollegeHeader';
+import Swal from 'sweetalert2';
 
 const StudentDashboard = () => {
   const { user, token, logout } = useContext(AuthContext);
@@ -55,7 +56,11 @@ const StudentDashboard = () => {
       }
     } catch (err) {
       console.error(err);
-      setError('Failed to fetch profile details.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Fetch Error',
+        text: 'Failed to fetch profile details.'
+      });
     } finally {
       setLoading(false);
     }
@@ -70,13 +75,16 @@ const StudentDashboard = () => {
   const handlePhotoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 10 * 1024 * 1024) {
-        setError(`Photo must be less than 10MB. Selected file is ${(file.size / (1024 * 1024)).toFixed(2)}MB.`);
+      if (file.size > 2 * 1024 * 1024) {
+        Swal.fire({
+          icon: 'error',
+          title: 'File Size Exceeded',
+          text: `Photo must be less than 2MB. Selected file is ${(file.size / (1024 * 1024)).toFixed(2)}MB.`
+        });
         e.target.value = null;
         setPhotoFile(null);
         return;
       }
-      setError('');
       setPhotoFile(file);
       setPhotoPreview(URL.createObjectURL(file));
     }
@@ -94,12 +102,14 @@ const StudentDashboard = () => {
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     if (phone.length !== 13) {
-      setError('Phone number must contain exactly 10 digits after +91.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Phone number must contain exactly 10 digits after +91.'
+      });
       return;
     }
     setSaving(true);
-    setError('');
-    setSuccess('');
 
     const submissionData = new FormData();
     submissionData.append('phone', phone);
@@ -122,12 +132,20 @@ const StudentDashboard = () => {
       }
 
       setProfile(data.student);
-      setSuccess('Your profile contact information updated successfully.');
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Your profile contact information updated successfully.'
+      });
       if (data.student.photo) {
         setPhotoPreview(getFileUrl(data.student.photo));
       }
     } catch (err) {
-      setError(err.message || 'An error occurred while saving.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Save Failed',
+        text: err.message || 'An error occurred while saving.'
+      });
     } finally {
       setSaving(false);
     }
@@ -142,8 +160,12 @@ const StudentDashboard = () => {
   const handleOptionalDocChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 10 * 1024 * 1024) {
-        alert(`File size error: Selected file must be less than 10MB. Selected file is ${(file.size / (1024 * 1024)).toFixed(2)}MB.`);
+      if (file.size > 2 * 1024 * 1024) {
+        Swal.fire({
+          icon: 'error',
+          title: 'File Size Exceeded',
+          text: `Selected file must be less than 2MB. Selected file is ${(file.size / (1024 * 1024)).toFixed(2)}MB.`
+        });
         e.target.value = null;
         setOptionalDocFile(null);
       } else {
@@ -155,21 +177,31 @@ const StudentDashboard = () => {
   const handleUploadOptionalDoc = async (e) => {
     e.preventDefault();
     if (!optionalDocFile) {
-      alert('Please select a file to upload.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Please select a file to upload.'
+      });
       return;
     }
-    if (optionalDocFile.size > 10 * 1024 * 1024) {
-      alert(`File size error: Selected file must be less than 10MB. Currently it is ${(optionalDocFile.size / (1024 * 1024)).toFixed(2)}MB.`);
+    if (optionalDocFile.size > 2 * 1024 * 1024) {
+      Swal.fire({
+        icon: 'error',
+        title: 'File Size Exceeded',
+        text: `Selected file must be less than 2MB. Currently it is ${(optionalDocFile.size / (1024 * 1024)).toFixed(2)}MB.`
+      });
       return;
     }
     if (!selectedOptionalDocType) {
-      alert('Please select a document type.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Please select a document type.'
+      });
       return;
     }
 
     setUploadingOptional(true);
-    setError('');
-    setSuccess('');
 
     const isOther = selectedOptionalDocType === 'other';
     const uploadData = new FormData();
@@ -198,18 +230,24 @@ const StudentDashboard = () => {
         throw new Error(data.message || 'Upload failed');
       }
 
-      setSuccess(
-        isOther 
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: isOther 
           ? `Document "${customDocName}" uploaded successfully.` 
           : `${selectedOptionalDocType === 'marksheet12' ? '12th Marksheet' : 'Caste Certificate'} uploaded successfully.`
-      );
+      });
       setProfile(data.student);
       setSelectedOptionalDocType('');
       setCustomDocName('');
       setOptionalDocFile(null);
       e.target.reset(); // Clear file input
     } catch (err) {
-      setError(err.message || 'An error occurred during upload.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Upload Failed',
+        text: err.message || 'An error occurred during upload.'
+      });
     } finally {
       setUploadingOptional(false);
     }
@@ -217,23 +255,33 @@ const StudentDashboard = () => {
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
-    setPwdError('');
-    setPwdSuccess('');
 
     if (newPassword.length < 8 || newPassword.length > 16) {
-      setPwdError('New password must be between 8 and 16 characters long.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'New password must be between 8 and 16 characters long.'
+      });
       return;
     }
     const hasLetter = /[a-zA-Z]/.test(newPassword);
     const hasNumber = /[0-9]/.test(newPassword);
     const hasSpecial = /[!@#$%^&*(),.?":{}|<>_+\-=\[\]{};':"\\|#`~]/.test(newPassword);
     if (!hasLetter || !hasNumber || !hasSpecial) {
-      setPwdError('New password must contain a mix of letters, numbers, and special symbols.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'New password must contain a mix of letters, numbers, and special symbols.'
+      });
       return;
     }
 
     if (newPassword !== confirmNewPassword) {
-      setPwdError('New passwords do not match.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'New passwords do not match.'
+      });
       return;
     }
 
@@ -251,12 +299,20 @@ const StudentDashboard = () => {
       if (!res.ok) {
         throw new Error(data.message || 'Failed to update password');
       }
-      setPwdSuccess('Your password has been changed successfully.');
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Your password has been changed successfully.'
+      });
       setCurrentPassword('');
       setNewPassword('');
       setConfirmNewPassword('');
     } catch (err) {
-      setPwdError(err.message || 'An error occurred.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: err.message || 'An error occurred.'
+      });
     } finally {
       setPwdSaving(false);
     }
@@ -298,32 +354,6 @@ const StudentDashboard = () => {
       </div>
 
       <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-        {error && (
-          <div style={{
-            background: 'rgba(239, 68, 68, 0.12)',
-            border: '1px solid var(--danger)',
-            color: 'var(--danger)',
-            padding: '14px 20px',
-            borderRadius: '10px',
-            marginBottom: '24px'
-          }}>
-            {error}
-          </div>
-        )}
-
-        {success && (
-          <div style={{
-            background: 'rgba(16, 185, 129, 0.12)',
-            border: '1px solid var(--success)',
-            color: 'var(--success)',
-            padding: '14px 20px',
-            borderRadius: '10px',
-            marginBottom: '24px'
-          }}>
-            {success}
-          </div>
-        )}
-
         <div className="responsive-grid-2">
           {/* Left panel: Profile preview card & Uploads */}
           <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -342,7 +372,7 @@ const StudentDashboard = () => {
               )}
               
               <label className="btn btn-secondary photo-upload-btn" style={{ padding: '6px 14px', fontSize: '0.8rem', gap: '6px' }}>
-                <Camera size={14} /> Update Photo <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>(Max 10MB)</span>
+                <Camera size={14} /> Update Photo <span style={{ fontSize: '0.75rem', opacity: 0.8 }}>(Max 2MB)</span>
                 <input type="file" accept="image/*" onChange={handlePhotoChange} disabled={saving} />
               </label>
             </div>
@@ -444,7 +474,7 @@ const StudentDashboard = () => {
                 )}
 
                 <div className="form-group" style={{ marginBottom: '16px' }}>
-                  <label className="form-label" style={{ fontSize: '0.75rem' }}>Select File (PDF/Image) <span style={{ color: 'var(--text-muted)', fontSize: '0.7rem', fontWeight: 'normal' }}>(Max 10MB)</span></label>
+                  <label className="form-label" style={{ fontSize: '0.75rem' }}>Select File (PDF/Image) <span style={{ color: 'var(--text-muted)', fontSize: '0.7rem', fontWeight: 'normal' }}>(Max 2MB)</span></label>
                   <input 
                     type="file" 
                     className="form-input" 
@@ -594,34 +624,6 @@ const StudentDashboard = () => {
               <h2 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: '24px', borderBottom: '1px solid var(--border-color)', paddingBottom: '12px' }}>
                 Change Login Password
               </h2>
-
-              {pwdError && (
-                <div style={{
-                  background: 'rgba(239, 68, 68, 0.12)',
-                  border: '1px solid var(--danger)',
-                  color: 'var(--danger)',
-                  padding: '12px 16px',
-                  borderRadius: '8px',
-                  marginBottom: '20px',
-                  fontSize: '0.9rem'
-                }}>
-                  {pwdError}
-                </div>
-              )}
-
-              {pwdSuccess && (
-                <div style={{
-                  background: 'rgba(16, 185, 129, 0.12)',
-                  border: '1px solid var(--success)',
-                  color: 'var(--success)',
-                  padding: '12px 16px',
-                  borderRadius: '8px',
-                  marginBottom: '20px',
-                  fontSize: '0.9rem'
-                }}>
-                  {pwdSuccess}
-                </div>
-              )}
 
               <form onSubmit={handleChangePassword}>
                 <div className="form-group">

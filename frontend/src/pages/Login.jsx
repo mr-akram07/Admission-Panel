@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { LogIn, ShieldAlert, GraduationCap, FileText, Eye, EyeOff } from 'lucide-react';
 import CollegeHeader from '../components/CollegeHeader';
+import Swal from 'sweetalert2';
 
 const Login = () => {
   const [role, setRole] = useState('applicant'); // applicant, student, admin, teacher
@@ -17,14 +18,16 @@ const Login = () => {
 
   const handleRoleChange = (selectedRole) => {
     setRole(selectedRole);
-    setFormError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setFormError('');
     if (!usernameOrEmail || !password) {
-      setFormError('Please fill in all fields.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Please fill in all fields.'
+      });
       return;
     }
 
@@ -40,7 +43,11 @@ const Login = () => {
         navigate('/applicant');
       }
     } catch (err) {
-      setFormError(err.message || 'Login failed. Please check credentials.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Login Failed',
+        text: err.message || 'Login failed. Please check credentials.'
+      });
     } finally {
       setLoading(false);
     }
@@ -151,21 +158,6 @@ const Login = () => {
             Admin
           </button>
         </div>
-
-        {formError && (
-          <div style={{
-            background: 'rgba(239, 68, 68, 0.12)',
-            border: '1px solid var(--danger)',
-            color: 'var(--danger)',
-            padding: '12px 16px',
-            borderRadius: '8px',
-            marginBottom: '20px',
-            fontSize: '0.9rem',
-            textAlign: 'center'
-          }}>
-            {formError}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">

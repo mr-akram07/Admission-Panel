@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { AuthContext, API_URL, getFileUrl } from '../context/AuthContext';
 import { LogOut, CheckCircle2, Clock, XCircle, FilePlus, ChevronRight } from 'lucide-react';
+import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import CollegeHeader from '../components/CollegeHeader';
 
@@ -70,7 +71,11 @@ const ApplicantDashboard = () => {
       }
     } catch (err) {
       console.error(err);
-      setError(err.message || 'Failed to fetch application status.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Fetch Error',
+        text: err.message || 'Failed to fetch application status.'
+      });
     } finally {
       setLoading(false);
     }
@@ -99,8 +104,12 @@ const ApplicantDashboard = () => {
   const handleFileChange = (setter, label) => (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (file.size > 10 * 1024 * 1024) {
-        setError(`File size error: ${label} must be less than 10MB. Selected file is ${(file.size / (1024 * 1024)).toFixed(2)}MB.`);
+      if (file.size > 2 * 1024 * 1024) {
+        Swal.fire({
+          icon: 'error',
+          title: 'File Size Exceeded',
+          text: `${label} must be less than 2MB. Selected file is ${(file.size / (1024 * 1024)).toFixed(2)}MB.`
+        });
         e.target.value = null; // reset file input
         setter(null);
       } else {
@@ -124,49 +133,53 @@ const ApplicantDashboard = () => {
 
     // Phone validation (+91 followed by exactly 10 digits)
     if (formData.phone.length !== 13) {
-      setError('Phone number must contain exactly 10 digits after +91.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Phone number must contain exactly 10 digits after +91.'
+      });
       return;
     }
 
     // File validation
     if (!photoFile) {
-      setError('Applicant photo is compulsory.');
+      Swal.fire({ icon: 'error', title: 'Validation Error', text: 'Applicant photo is compulsory.' });
       return;
     }
-    if (photoFile.size > 10 * 1024 * 1024) {
-      setError('Applicant photo must be less than 10MB.');
+    if (photoFile.size > 2 * 1024 * 1024) {
+      Swal.fire({ icon: 'error', title: 'Validation Error', text: 'Applicant photo must be less than 2MB.' });
       return;
     }
     if (!marksheet10File) {
-      setError('10th Marksheet is compulsory.');
+      Swal.fire({ icon: 'error', title: 'Validation Error', text: '10th Marksheet is compulsory.' });
       return;
     }
-    if (marksheet10File.size > 10 * 1024 * 1024) {
-      setError('10th Marksheet must be less than 10MB.');
+    if (marksheet10File.size > 2 * 1024 * 1024) {
+      Swal.fire({ icon: 'error', title: 'Validation Error', text: '10th Marksheet must be less than 2MB.' });
       return;
     }
-    if (marksheet12File && marksheet12File.size > 10 * 1024 * 1024) {
-      setError('12th Marksheet must be less than 10MB.');
+    if (marksheet12File && marksheet12File.size > 2 * 1024 * 1024) {
+      Swal.fire({ icon: 'error', title: 'Validation Error', text: '12th Marksheet must be less than 2MB.' });
       return;
     }
     if (!incomeCertFile) {
-      setError('Income Certificate is compulsory.');
+      Swal.fire({ icon: 'error', title: 'Validation Error', text: 'Income Certificate is compulsory.' });
       return;
     }
-    if (incomeCertFile.size > 10 * 1024 * 1024) {
-      setError('Income Certificate must be less than 10MB.');
+    if (incomeCertFile.size > 2 * 1024 * 1024) {
+      Swal.fire({ icon: 'error', title: 'Validation Error', text: 'Income Certificate must be less than 2MB.' });
       return;
     }
     if (!domicileCertFile) {
-      setError('Domicile Certificate is compulsory.');
+      Swal.fire({ icon: 'error', title: 'Validation Error', text: 'Domicile Certificate is compulsory.' });
       return;
     }
-    if (domicileCertFile.size > 10 * 1024 * 1024) {
-      setError('Domicile Certificate must be less than 10MB.');
+    if (domicileCertFile.size > 2 * 1024 * 1024) {
+      Swal.fire({ icon: 'error', title: 'Validation Error', text: 'Domicile Certificate must be less than 2MB.' });
       return;
     }
-    if (casteCertFile && casteCertFile.size > 10 * 1024 * 1024) {
-      setError('Caste Certificate must be less than 10MB.');
+    if (casteCertFile && casteCertFile.size > 2 * 1024 * 1024) {
+      Swal.fire({ icon: 'error', title: 'Validation Error', text: 'Caste Certificate must be less than 2MB.' });
       return;
     }
 
@@ -205,11 +218,19 @@ const ApplicantDashboard = () => {
         throw new Error(data.message || 'Failed to submit application');
       }
 
-      setSuccessMsg('Your admission application has been submitted successfully.');
+      Swal.fire({
+        icon: 'success',
+        title: 'Submitted!',
+        text: 'Your admission application has been submitted successfully.'
+      });
       setApplication(data.application);
       fetchMyApplication();
     } catch (err) {
-      setError(err.message || 'An error occurred during submission.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Submission Failed',
+        text: err.message || 'An error occurred during submission.'
+      });
     } finally {
       setFormLoading(false);
     }
@@ -617,7 +638,7 @@ const ApplicantDashboard = () => {
                   }}>
                     {/* Profile Photo Upload */}
                     <div className="form-group">
-                      <label className="form-label">Applicant Photo <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 'normal' }}>(Max 10MB)</span></label>
+                      <label className="form-label">Applicant Photo <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 'normal' }}>(Max 2MB)</span></label>
                       <input 
                         type="file" 
                         className="form-input" 
@@ -626,12 +647,12 @@ const ApplicantDashboard = () => {
                         required
                         disabled={formLoading}
                       />
-                      <small style={{ color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>Accepts JPEG, JPG, PNG, GIF, WEBP, BMP, SVG. Max size: 10MB.</small>
+                      <small style={{ color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>Accepts JPEG, JPG, PNG, GIF, WEBP, BMP, SVG.</small>
                     </div>
 
                     {/* 10th Marksheet */}
                     <div className="form-group">
-                      <label className="form-label">10th Marksheet <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 'normal' }}>(Max 10MB)</span></label>
+                      <label className="form-label">10th Marksheet <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 'normal' }}>(Max 2MB)</span></label>
                       <input 
                         type="file" 
                         className="form-input" 
@@ -640,12 +661,12 @@ const ApplicantDashboard = () => {
                         required
                         disabled={formLoading}
                       />
-                      <small style={{ color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>Upload 10th Marksheet (PDF or Image). Max size: 10MB.</small>
+                      <small style={{ color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>Upload 10th Marksheet (PDF or Image). Max size: 2MB.</small>
                     </div>
 
                     {/* 12th Marksheet */}
                     <div className="form-group">
-                      <label className="form-label">12th Marksheet (Optional) <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 'normal' }}>(Max 10MB)</span></label>
+                      <label className="form-label">12th Marksheet (Optional) <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 'normal' }}>(Max 2MB)</span></label>
                       <input 
                         type="file" 
                         className="form-input" 
@@ -653,12 +674,12 @@ const ApplicantDashboard = () => {
                         onChange={handleMarksheet12Change}
                         disabled={formLoading}
                       />
-                      <small style={{ color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>Upload 12th Marksheet if available. Max size: 10MB.</small>
+                      <small style={{ color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>Upload 12th Marksheet if available. Max size: 2MB.</small>
                     </div>
 
                     {/* Income Cert */}
                     <div className="form-group">
-                      <label className="form-label">Income Certificate <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 'normal' }}>(Max 10MB)</span></label>
+                      <label className="form-label">Income Certificate <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 'normal' }}>(Max 2MB)</span></label>
                       <input 
                         type="file" 
                         className="form-input" 
@@ -667,12 +688,12 @@ const ApplicantDashboard = () => {
                         required
                         disabled={formLoading}
                       />
-                      <small style={{ color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>Upload Income Certificate. Max size: 10MB.</small>
+                      <small style={{ color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>Upload Income Certificate. Max size: 2MB.</small>
                     </div>
 
                     {/* Domicile Cert */}
                     <div className="form-group">
-                      <label className="form-label">Domicile Certificate <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 'normal' }}>(Max 10MB)</span></label>
+                      <label className="form-label">Domicile Certificate <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 'normal' }}>(Max 2MB)</span></label>
                       <input 
                         type="file" 
                         className="form-input" 
@@ -681,12 +702,12 @@ const ApplicantDashboard = () => {
                         required
                         disabled={formLoading}
                       />
-                      <small style={{ color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>Upload Domicile Certificate. Max size: 10MB.</small>
+                      <small style={{ color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>Upload Domicile Certificate. Max size: 2MB.</small>
                     </div>
 
                     {/* Caste Cert */}
                     <div className="form-group">
-                      <label className="form-label">Caste Certificate (Optional) <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 'normal' }}>(Max 10MB)</span></label>
+                      <label className="form-label">Caste Certificate (Optional) <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem', fontWeight: 'normal' }}>(Max 2MB)</span></label>
                       <input 
                         type="file" 
                         className="form-input" 
@@ -694,7 +715,7 @@ const ApplicantDashboard = () => {
                         onChange={handleCasteCertChange}
                         disabled={formLoading}
                       />
-                      <small style={{ color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>Upload Caste Certificate if applicable. Max size: 10MB.</small>
+                      <small style={{ color: 'var(--text-muted)', display: 'block', marginTop: '4px' }}>Upload Caste Certificate if applicable. Max size: 2MB.</small>
                     </div>
                   </div>
                 </div>

@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { UserPlus, Check, X, Eye, EyeOff } from 'lucide-react';
 import CollegeHeader from '../components/CollegeHeader';
+import Swal from 'sweetalert2';
 
 const Register = () => {
   const [username, setUsername] = useState('');
@@ -50,34 +51,58 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setFormError('');
 
     if (!/^[a-zA-Z0-9]+$/.test(username)) {
-      setFormError('Username cannot contain spaces or special characters.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Username cannot contain spaces or special characters.'
+      });
       return;
     }
 
     if (password.length < 8 || password.length > 16) {
-      setFormError('Password must be between 8 and 16 characters long.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Password must be between 8 and 16 characters long.'
+      });
       return;
     }
 
     if (!/[a-zA-Z]/.test(password) || !/[0-9]/.test(password) || !/[!@#$%^&*(),.?":{}|<>_+\-=\[\]{};':"\\|#`~]/.test(password)) {
-      setFormError('Password must contain a mix of letters, numbers, and special symbols.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Password must contain a mix of letters, numbers, and special symbols.'
+      });
       return;
     }
 
     if (password !== confirmPassword) {
-      setFormError('Passwords do not match.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Passwords do not match.'
+      });
       return;
     }
 
     setLoading(true);
     try {
       await register(username, email, password);
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: 'Account created successfully!'
+      });
       navigate('/applicant');
     } catch (err) {
-      setFormError(err.message || 'Registration failed.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Registration Failed',
+        text: err.message || 'Registration failed.'
+      });
     } finally {
       setLoading(false);
     }
@@ -109,21 +134,6 @@ const Register = () => {
             Register to start your admission process
           </p>
         </div>
-
-        {formError && (
-          <div style={{
-            background: 'rgba(239, 68, 68, 0.12)',
-            border: '1px solid var(--danger)',
-            color: 'var(--danger)',
-            padding: '12px 16px',
-            borderRadius: '8px',
-            marginBottom: '20px',
-            fontSize: '0.9rem',
-            textAlign: 'center'
-          }}>
-            {formError}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
